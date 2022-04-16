@@ -1,13 +1,13 @@
-import React from "react";
-import { View, Text } from "react-native";
+import { Text, View } from 'react-native'
+import React, { Component } from 'react'
 
 const SigninScreen = () => {
-return
-    (
-        <View>
-        <Text>Sign-in Screen</Text>
-        </View>
+    return (
+      <View>
+        <Text>SigninScreen</Text>
+      </View>
     )
-};
+}
+
 
 export default SigninScreen;
