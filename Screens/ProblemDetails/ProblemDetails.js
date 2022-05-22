@@ -21,6 +21,7 @@ const ProblemDetails = (props) => {
     image,
     stepsTaken,
     canBid,
+    issue_id,
   } = props.route.params;
   const navigation = useNavigation();
 
@@ -29,8 +30,10 @@ const ProblemDetails = (props) => {
       return (
         <CustomButton
           title="Bid"
-          onPress={() => {navigation.navigate("BiddingRequest")}}         
-        ></CustomButton>        
+          onPress={() => {
+            navigation.navigate("BiddingRequest", { issue_id: issue_id });
+          }}
+        ></CustomButton>
       );
     }
   };
@@ -59,9 +62,9 @@ const ProblemDetails = (props) => {
           <Text style={styles.text}>
             <Text style={styles.title}>Steps taken by the engineer:</Text>{" "}
           </Text>
-          <Text style={styles.text}>{stepsTaken}</Text>         
+          <Text style={styles.text}>{stepsTaken}</Text>
         </View>
-        {bidButton()}        
+        {bidButton()}
       </View>
     </ScrollView>
   );

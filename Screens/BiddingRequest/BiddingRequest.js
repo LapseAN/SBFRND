@@ -15,43 +15,48 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import CustomButton from "../../components/CustomButton/CustomButton";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
 
 const BiddingRequest = (props) => {
+  const user = useSelector((state) => state.user);
   const [timeToFix, setTimeToFix] = useState("");
-  const [sendBackTime, setSendBackTime] = useState("");
+  const [sendBackDate, setSendBackDate] = useState("");
   const [needSupport, setNeedSupport] = useState("");
   const [needSpare, setNeedSpare] = useState("");
   const [possibleCost, setPossibleCost] = useState("");
   const [haveExistingTask, setHaveExistingTask] = useState("");
+  const [issue_id, setIssue_id] = useState(props.route.params.issue_id);
+  const [user_id, setUser_id] = useState(user.user_id);
 
   const timeToFixChangeHandler = (entered) => {
     setTimeToFix(entered);
-    console.log(timeToFix);
+    // console.log(timeToFix);
   };
 
   const sendBackTimeCangeHandler = (entered) => {
-    setSendBackTime(entered);
-    console.log(sendBackTime);
+    setSendBackDate(entered);
+    // console.log(sendBackDate);
   };
 
   const needSupportCangeHandler = (entered) => {
     setNeedSupport(entered);
-    console.log(needSupport);
+    // console.log(needSupport);
   };
 
   const needSpareCangeHandler = (entered) => {
     setNeedSpare(entered);
-    console.log(needSupport);
+    // console.log(needSupport);
   };
 
   const possibleCostCangeHandler = (entered) => {
     setPossibleCost(entered);
-    console.log(needSpare);
+    // console.log(needSpare);
   };
 
   const haveExistingTaskCangeHandler = (entered) => {
     setHaveExistingTask(entered);
-    console.log(possibleCost);
+    // console.log(possibleCost);
   };
   return (
     // <SafeAreaView>
@@ -70,7 +75,7 @@ const BiddingRequest = (props) => {
         <TextInput
           style={styles.input}
           onChangeText={sendBackTimeCangeHandler}
-          value={sendBackTime}
+          value={sendBackDate}
         />
 
         <Text style={styles.titleText}>
@@ -101,7 +106,26 @@ const BiddingRequest = (props) => {
           value={haveExistingTask}
         />
       </View>
-      <CustomButton title="Submit"></CustomButton>
+      <CustomButton
+        title="Submit"
+        onPress={() => {
+          // console.log(user_id);
+          axios.defaults.headers.common["Authorization"] = `Bearer ${user.pat}`;
+          axios
+            .post(`https://sbfrnd.herokuapp.com/api/bids`, {
+              issue_id: issue_id,
+              user_id: user_id,
+              timeToFix: timeToFix,
+              sendBackDate: sendBackDate,
+              needSupport: needSupport,
+              needSpare: needSpare,
+              possibleCost: possibleCost,
+              haveExistingTask: haveExistingTask,
+            })
+            .then((response) => console.log(response.data))
+            .catch((error) => console.log(error.response));
+        }}
+      ></CustomButton>
     </KeyboardAwareScrollView>
     // </SafeAreaView>
   );

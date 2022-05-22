@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView, Text } from "react-native";
-import { useSelector, useDispatch } from "react-redux";
 
 import ProblemOverview from "../../components/ProblemOverview/ProblemOverview";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
-const ProblemOnProcess = () => {
+const Solved = () => {
   const [canBid, setCanBid] = useState(false);
   const navigation = useNavigation();
+  const [doneIssues, setDoneIssue] = useState([]);
   const user = useSelector((state) => state.user);
-  const [runningIssues, setRunningIssues] = useState([]);
 
   useEffect(() => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${user.pat}`;
     axios
-      .get("https://sbfrnd.herokuapp.com/api/runningIssues")
+      .get("https://sbfrnd.herokuapp.com/api/doneIssues")
       .then((response) => {
         console.log(response.data);
-        setRunningIssues(response.data);
-        console.log(runningIssues);
+        setDoneIssue(response.data);
+        console.log(doneIssues);
       })
       .catch((error) => {
         console.log(error.response);
       });
-  }, [runningIssues]);
+  });
 
   return (
     <View style={styles.container}>
@@ -33,24 +33,22 @@ const ProblemOnProcess = () => {
           style={styles.problemContainerInner}
           showsVerticalScrollIndicator={false}
         >
-          {runningIssues.length > 0 ? (
-            runningIssues.map((is) => {
+          {doneIssues.length > 0 ? (
+            doneIssues.map((is) => (
               <ProblemOverview
-                center="Barishal Center"
                 alarm={is.alarm}
-                date={is.date}
-                history={is.history}
                 description={is.description}
-                image="https://www.pngitem.com/pimgs/m/41-415798_doge-vector-illustration-doge-meme-vector-hd-png.png"
+                history={is.history}
                 stepsTaken={is.stepsTaken}
                 navigation={navigation}
-                issue_id={is.id}
                 canBid={canBid}
-              ></ProblemOverview>;
-            })
+                issue_id={is.id}
+                key={is.id}
+              />
+            ))
           ) : (
             <View style={styles.emptyDIv}>
-              <Text style={styles.emptyTitle}>No Problems</Text>
+              <Text style={styles.emptyTitle}>Empty!!</Text>
             </View>
           )}
         </ScrollView>
@@ -88,9 +86,9 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 30,
-    marginLeft: "25%",
+    marginLeft: "35%",
     fontWeight: "bold",
   },
 });
 
-export default ProblemOnProcess;
+export default Solved;

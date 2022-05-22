@@ -1,21 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, TextInput } from "react-native";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Resolving = () => {
-  const center = "Bogura Center";
-  const alarm = "Beeping on the motherboard";
-  const date = "11:30 03-05-2021";
-  const history = "Happened three times";
-  const description =
-    "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Distinctio quae totam quam expedita praesentium non magni alias debitis ut animi quas, sit dignissimos, deleniti delectus? Veritatis distinctio ducimus cumque rem!";
-  const image =
-    "https://www.pngitem.com/pimgs/m/41-415798_doge-vector-illustration-doge-meme-vector-hd-png.png";
-  const stepsTaken = ["Changed fluid", "Washed motherboard"];
   const [inputField, setInputField] = useState(false);
   const [stepsFollowed, setStepsFollowed] = useState("");
+  const [resolvingNow, setResolvingNow] = useState([""]);
+  const [alarm, setAlarm] = useState("");
+  const [history, setHistory] = useState("");
+  const [description, setDescription] = useState("");
+  const [stepsTaken, setStepsTaken] = useState("");
+  const [occuringDate, setOccuringDate] = useState("");
+  const [winner_id, setWinner_id] = useState("");
+  const [user_id, setUser_id] = useState("");
+
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${user.pat}`;
+    axios
+      .get(`https://sbfrnd.herokuapp.com/api/resolving-now/${user.user_id}`)
+      .then((response) => {
+        if (response.status === 200) {
+          setResolvingNow(response.data);
+          console.log(resolvingNow[0]);
+          setAlarm(resolvingNow[0].bid.issue.alarm);
+          setHistory(resolvingNow[0].bid.issue.history);
+          setDescription(resolvingNow[0].bid.issue.description);
+          setStepsTaken(resolvingNow[0].bid.issue.stepsTaken);
+          setOccuringDate(resolvingNow[0].bid.issue.occuringDate);
+          setWinner_id(resolvingNow[0].id);
+          setUser_id(resolvingNow[0].user_id);
+        } else {
+          console.log("Empty");
+        }
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+  }, [resolvingNow]);
 
   const buttonField = () => {
     const navigation = useNavigation();
@@ -39,7 +66,24 @@ const Resolving = () => {
           />
           <CustomButton
             title="Finish"
-            onPress={() => navigation.navigate("FinishScreen")}
+            onPress={() => {
+              console.log(winner_id, user_id);
+              axios.defaults.headers.common[
+                "Authorization"
+              ] = `Bearer ${user.pat}`;
+              axios
+                .post(
+                  `https://sbfrnd.herokuapp.com/api/complete/${winner_id}/${user_id}`,
+                  {
+                    stepsFollowed: stepsFollowed,
+                  }
+                )
+                .then((response) => {
+                  console.log(response);
+                })
+                .catch((error) => console.log(error.response));
+              navigation.navigate("Profile");
+            }}
           ></CustomButton>
         </View>
       );
@@ -61,24 +105,27 @@ const Resolving = () => {
           </View>
           <View style={styles.InnerContainer}>
             <Text style={styles.text}>
-              <Text style={styles.title}>Alarm:</Text> {alarm}
+              <Text style={styles.title}>Alarm:</Text>
+              {alarm}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.title}>Date:</Text> {date}
+              <Text style={styles.title}>Date:</Text>
+              {occuringDate}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.title}>History:</Text> {history}
+              <Text style={styles.title}>History:</Text>
+              {history}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.title}>Description:</Text> {description}
+              <Text style={styles.title}>Description:</Text>
+              {description}
             </Text>
             <Text style={styles.text}>
-              <Text style={styles.title}>Steps Taken:</Text> {stepsTaken}
+              <Text style={styles.title}>Steps Taken:</Text>
+              {stepsTaken}
             </Text>
-            <Text style={styles.text}>
-              <Text style={styles.title}>Images:</Text>{" "}
-            </Text>
-            <View style={styles.imageDiv}>
+
+            {/* <View style={styles.imageDiv}>
               <Image
                 style={styles.tinyLogo}
                 source={{
@@ -97,7 +144,7 @@ const Resolving = () => {
                   uri: "https://reactnative.dev/img/tiny_logo.png",
                 }}
               />
-            </View>
+            </View> */}
           </View>
           {buttonField()}
         </View>

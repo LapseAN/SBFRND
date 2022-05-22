@@ -12,6 +12,7 @@ const ProblemOverview = (props) => {
     image,
     stepsTaken,
     canBid,
+    issue_id,
   } = props;
 
   const showDetails = () => {
@@ -24,6 +25,7 @@ const ProblemOverview = (props) => {
       image,
       stepsTaken,
       canBid,
+      issue_id,
     });
   };
   return (
@@ -35,9 +37,7 @@ const ProblemOverview = (props) => {
           <Text style={styles.problemOverviewText}>Time: {date}</Text>
           <Text style={styles.problemOverviewText}>History: {history}</Text>
         </View>
-        <View style={styles.iconStyle}>
-          
-        </View>
+        <View style={styles.iconStyle}></View>
       </View>
     </TouchableOpacity>
   );
